@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
-/*this is the main function!*/
+/* this is the main function! */
 int main()
 {
     
@@ -21,8 +21,9 @@ int main()
     double months = days/30;
     double years = days/365;
     
-    printf("diff time(%f)seconds = %f years, %f months, %f weeks, %f days, %f hours, %f minutes \n", 
+    printf("diff time(%0.f)seconds = %f years, %f months, %f weeks, %f days, %f hours, %f minutes \n", 
         diff, years, months, weeks, days, hours, minutes);
     
     return 0;
 }
+
