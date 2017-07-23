@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
+/*this is the main function!*/
 int main()
 {
     
