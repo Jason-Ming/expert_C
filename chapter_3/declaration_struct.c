@@ -18,13 +18,13 @@ struct pid_tag
 	unsigned int          : 0; /* 填充到下一个字边界 */
 	short pid;
 	struct pid_tag *link;
-}
+};
 
 //类型定义和变量声明分开
 struct veg 
 {
 	int weight, price_per_1b;
-}
+};
 
 struct veg onion, radish, turnip;
 
@@ -47,6 +47,15 @@ struct s_tag twofold(struct s_tag s)
 	return s;
 }
 
+void print_s(struct s_tag *p)
+{
+	int j;
+	for(j = 0; j < 100; j++)
+	{
+		printf("a[%2d] = %3d. \n", j, p->a[j]);
+	}
+}
+
 struct node_tag
 {
 	int datum;
@@ -65,6 +74,10 @@ void main()
 	
 	lemon = twofold(lime);
 	orange = lemon; //给整个结构赋值
+	
+	print_s(&lime);
+	print_s(&lemon);
+	print_s(&orange);
 	
 	a.next = &b;
 	a.next->next = NULL;
