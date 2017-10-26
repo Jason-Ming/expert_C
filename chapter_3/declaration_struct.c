@@ -62,6 +62,12 @@ struct node_tag
 	struct node_tag *next;
 };
 
+typedef struct STRU_NODE_TAG
+{
+	int datum;
+	struct STRU_NODE_TAG *next;
+}STRU_NODE;
+
 struct node_tag a, b;
 
 void main()

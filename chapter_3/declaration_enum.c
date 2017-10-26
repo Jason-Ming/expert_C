@@ -17,6 +17,7 @@ void main()
 
     
     sizes = humungous;
+    sizes = 12;
     f(sizes);
     printf("enums = %d, %d, %d, %d.\n", small, medium, large, humungous);
     
