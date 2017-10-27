@@ -8,7 +8,7 @@
 
 enum enum_tag_type
 {
-	INDENTIFIER,
+	IDENTIFIER,
 	QUALIFIER,
 	POINTER,
 	TYPE
@@ -73,7 +73,7 @@ enum enum_tag_type classify_string(void)
         }    
     }
     
-    return INDENTIFIER;
+    return IDENTIFIER;
 }
 
 /* 读取下一个标记到this */
@@ -101,17 +101,121 @@ void get_token(void)
         return;
     }
 
+	/* 可能是*,[],() */
     if(*p == '*')
     {
-        strcpy(this.string, "pointer to");
+		*(++p) = '\0';
+		
+        this.type = classify_string();
+		return;
     }
+
+	this.string[1] = '\0';
+	this.type = *p;
+	return;
+}
+
+#define GET_TOKEN {get_token(); /*printf("new token: %s, %d \n", this.string, this.type);*/}
+
+/* 理解所有分析过程的代码段 */
+void read_to_first_identifier()
+{
+	GET_TOKEN;
+	
+	while(this.type != IDENTIFIER)
+	{
+		PUSH(this);
+		GET_TOKEN;
+	}
+
+	printf("%s is ", this.string);
+	GET_TOKEN;
+}
+
+void deal_with_arrays(void)
+{
+	while(this.type == '[')
+	{
+		printf("array ");
+
+		/* 数字或者] */
+		GET_TOKEN;
+
+		if(isdigit(this.string[0]))
+		{
+			printf("0..%d ", atoi(this.string) - 1);
+
+			/* 读取] */
+			GET_TOKEN;
+		}
+
+		GET_TOKEN;
+		printf("of ");
+	}
+}
+
+void deal_with_function_args(void)
+{
+	while(this.type != ')')
+	{
+		GET_TOKEN;
+	}
+
+	GET_TOKEN;
+	printf("function returning ");
+}
+
+void deal_with_pointers(void)
+{
+	while(stack[top].type == POINTER)
+	{
+		printf("%s ", POP.string);
+	}
+}
+
+void deal_with_declarator()
+{
+	/* 处理标识符之后可能存在的数组和函数 */
+	switch(this.type)
+	{
+		case '[' : 
+		{
+			deal_with_arrays();
+			break;
+		}
+
+		case '(' :
+		{
+			deal_with_function_args();
+			break;
+		}
+	}
+
+	deal_with_pointers();
+
+	/* 处理在读入标识符之前压入到堆栈中的符号 */
+	while(top >= 0)
+	{
+		if(stack[top].type == '(')
+		{
+			POP;
+			GET_TOKEN;
+			deal_with_declarator();
+		}
+		else
+		{
+			printf("%s ", POP.string);
+		}
+	}
 }
 
 void main()
 {
-    char p;
-    while((p = getchar()) == ' ');
-    printf("%c", p);
+	/* 将标记压到堆栈中，直到遇见标识符 */
+    read_to_first_identifier();
+	deal_with_declarator();
+	printf("\n");
+	return;
     
 }
 
