@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#include "utils_define.h"
+
 #define MAXTOKENS 100
 #define MAXTOKENLEN 64
 
@@ -22,12 +24,22 @@ struct struct_tag_token
 
 int top = -1;
 struct struct_tag_token stack[MAXTOKENS];
-struct struct_tag_token this;
+struct struct_tag_token current;
 
 #define POP stack[top--]
 #define PUSH(s) stack[++top] = s
 #define STRING_EQUAL(src, dest) (strcmp(src, dest) == 0)
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
+
+void print_stack()
+{
+    LOG("\n");
+    
+    for(int i = 0; i <= top; i++)
+    {
+        LOG("string = %16s, type = %d.\n", stack[i].string, stack[i].type);
+    }
+}
 
 struct struct_tag_classifier
 {
@@ -39,7 +51,7 @@ struct struct_tag_classifier
 struct struct_tag_classifier classifiers[] =
 {
     {"const",    QUALIFIER, "read-only"},
-    {"volatile", QUALIFIER, ""},
+    {"volatile", QUALIFIER, "volatile"},
     {"void",     TYPE, ""},
     {"char",     TYPE, ""},
     {"signed",     TYPE, ""},
@@ -58,7 +70,7 @@ struct struct_tag_classifier classifiers[] =
 /* 推断标识符的类型 */
 enum enum_tag_type classify_string(void)
 {
-	char* s = this.string;
+	char* s = current.string;
 
     for(int i = 0; i < ARRAY_SIZE(classifiers); i++)
     {
@@ -76,10 +88,10 @@ enum enum_tag_type classify_string(void)
     return IDENTIFIER;
 }
 
-/* 读取下一个标记到this */
+/* 读取下一个标记到current */
 void get_token(void)
 {
-    char *p = this.string;
+    char *p = current.string;
 
     /* 略过空白字符 */
     while((*p = getchar()) == ' ')
@@ -96,7 +108,7 @@ void get_token(void)
         ungetc(*p, stdin);
         *p = '\0';
 
-        this.type = classify_string();
+        current.type = classify_string();
 
         return;
     }
@@ -106,44 +118,52 @@ void get_token(void)
     {
 		*(++p) = '\0';
 		
-        this.type = classify_string();
+        current.type = classify_string();
 		return;
     }
 
-	this.string[1] = '\0';
-	this.type = *p;
+	current.string[1] = '\0';
+	current.type = *p;
 	return;
 }
 
-#define GET_TOKEN {get_token(); /*printf("new token: %s, %d \n", this.string, this.type);*/}
+#define GET_TOKEN \
+    {\
+        get_token(); \
+        LOG("new token: %s, %d \n", current.string, current.type);\
+    }
 
 /* 理解所有分析过程的代码段 */
 void read_to_first_identifier()
 {
+    LOG("read_to_first_identifier.\n");
 	GET_TOKEN;
 	
-	while(this.type != IDENTIFIER)
+	while(current.type != IDENTIFIER)
 	{
-		PUSH(this);
+		PUSH(current);
 		GET_TOKEN;
 	}
 
-	printf("%s is ", this.string);
+	printf("%s is ", current.string);
 	GET_TOKEN;
+
+    print_stack();
 }
 
 void deal_with_arrays(void)
 {
-	while(this.type == '[')
+    LOG("deal_with_arrays.\n");
+	while(current.type == '[')
 	{
 		printf("array ");
 
 		/* 数字或者] */
 		GET_TOKEN;
 
-		if(isdigit(this.string[0]))
+		if(isdigit(current.string[0]))
 		{
-			printf("0..%d ", atoi(this.string) - 1);
+			printf("0..%d ", atoi(current.string) - 1);
 
 			/* 读取] */
 			GET_TOKEN;
@@ -156,7 +176,10 @@ void deal_with_arrays(void)
 
 void deal_with_function_args(void)
 {
-	while(this.type != ')')
+    LOG("deal_with_function_args.\n");
+    
+    /* 忽略函数的参数 */
+	while(current.type != ')')
 	{
 		GET_TOKEN;
 	}
@@ -167,6 +190,7 @@ void deal_with_function_args(void)
 
 void deal_with_pointers(void)
 {
+    LOG("deal_with_pointers.\n");
 	while(stack[top].type == POINTER)
 	{
 		printf("%s ", POP.string);
@@ -175,8 +199,10 @@ void deal_with_pointers(void)
 
 void deal_with_declarator()
 {
+    LOG("deal_with_declarator begin.\n");
+    
 	/* 处理标识符之后可能存在的数组和函数 */
-	switch(this.type)
+	switch(current.type)
 	{
 		case '[' : 
 		{
@@ -191,9 +217,9 @@ void deal_with_declarator()
 		}
 	}
 
+    /* 处理在读入标识符之前压入到堆栈中的符号 */
 	deal_with_pointers();
 
-	/* 处理在读入标识符之前压入到堆栈中的符号 */
 	while(top >= 0)
 	{
 		if(stack[top].type == '(')
@@ -207,14 +233,21 @@ void deal_with_declarator()
 			printf("%s ", POP.string);
 		}
 	}
+
+    LOG("deal_with_declarator end.\n");
 }
 
 void main()
 {
 	/* 将标记压到堆栈中，直到遇见标识符 */
     read_to_first_identifier();
+
 	deal_with_declarator();
+
 	printf("\n");
+
+    LOG1("ss");
+
 	return;
     
 }
