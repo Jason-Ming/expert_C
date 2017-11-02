@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-char s[4] = "abc";
+char s[4];// = "abc";
 
 int i[4] = {1,2,3,4};
 
