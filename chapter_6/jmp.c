@@ -11,5 +11,16 @@ void banana()
 	printf("you will never see this, because i longjmp'd");
 }
 
-set
+void main()
+{
+	if(setjmp(buf))
+	{
+		printf("back in main\n");
+	}
+	else
+	{
+		printf("first time through\n");
+		banana();
+	}
+}
 
