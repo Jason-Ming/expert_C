@@ -34,7 +34,7 @@ void main()
         //printf("loop!\n");
         sleep(1);
         //signal(SIGINT, handler);
-        //raise(SIGINT);
+        raise(SIGINT);
         goto loop;
 }
 
