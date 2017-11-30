@@ -15,11 +15,11 @@ int main()
     printf("pid = %d.\n", getpid());
 
     struct sigaction act;
-    act.sa_flags = SA_SIGINFO;
-    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO;/* 使用新的结构 */
+    sigemptyset(&act.sa_mask);/* 不对任何信号阻塞 */
     act.sa_sigaction = sighandler;
 
-    if(sigaction(SIGRTMIN+5, &act, 0) == -1)
+    if(sigaction(SIGINT, &act, 0) == -1)
     {
         exit(-1);
     }

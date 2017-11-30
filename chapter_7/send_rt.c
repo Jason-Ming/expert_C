@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
     union sigval value;
     value.sival_int = 12345678;
     pid_t pid = (pid_t)atoi(argv[1]);
-    sigqueue(pid, SIGRTMIN+5, value);
+    sigqueue(pid, SIGINT, value);
     
     return 0;
 }

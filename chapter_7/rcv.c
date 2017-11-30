@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-
+/* 在send.c 发来的信号，这里只能处理部分，因为当处理信号的时候，部分信号被丢掉了 */
 void fun(int sig)
 {
     printf("Received a signal: %s.\n", strsignal(sig));
@@ -20,7 +20,7 @@ void fun1(int sig)
 
 int main()
 {
-    if(signal(SIGRTMIN+5, fun1) == SIG_ERR)
+    if(signal(SIGINT, fun1) == SIG_ERR)
     {
         perror("signal failed!\n");
     }
