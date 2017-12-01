@@ -19,14 +19,22 @@ void main()
     printf("%s\n",quickreply("Input"));
 }
 
-void (*was)(int signo);
-void catch(int signo);
+/* SIGALRM 信号处理函数*/
+void catch(int signo)
+{
+    /*  设定超时标志*/
+    time_out=TRUE;
+
+    /*  响铃警告*/
+    putchar(BELL);
+}
 
 char* quickreply (char* prompt)
 {
     int ntries;
     char* answer;
-
+    void (*was)(int signo);
+    
     /*  设定捕捉 SIGALRM 的的关联并保存原有关联*/
     was=signal(SIGALRM,catch);
 
@@ -55,15 +63,5 @@ char* quickreply (char* prompt)
     signal(SIGALRM,was);
 
     return (time_out?((char*) 0):answer);
-}
-
-/* SIGALRM 信号处理函数*/
-void catch(int signo)
-{
-    /*  设定超时标志*/
-    time_out=TRUE;
-
-    /*  响铃警告*/
-    putchar(BELL);
 }
 

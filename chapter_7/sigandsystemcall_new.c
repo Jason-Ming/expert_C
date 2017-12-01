@@ -34,6 +34,12 @@ int main()
     /* SA_NODEFER 这个掩码会使信号的处理可以被中断，不管是相同类型的信号还是不同类型的信号 */
     /*            如果不加这个掩码，就和signal的处理一样的，相同信号的会屏蔽，但是不同信号的会中断，但是只能中断一次  */
     act.sa_flags = SA_SIGINFO | SA_RESTART;// | SA_NODEFER;
+
+    // 屏蔽掉SIGINT 信号，signalHandlerNew 将不能再捕捉SIGINT 
+    sigset_t sigSet; 
+    sigemptyset(&sigSet); 
+    sigaddset(&sigSet,SIGINT); 
+    sigprocmask(SIG_BLOCK,&sigSet,NULL); 
     
     sigemptyset(&act.sa_mask); 
     sigaddset(&act.sa_mask,SIGQUIT); /* 使SIGINT不能被SIGQUIT中断,且SIGQUIT不能被自身中断 */
