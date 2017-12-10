@@ -2,7 +2,7 @@
 #include "printmem.h"
 void printMem(void *addr, int len)
 {
-    printf("start addr: %p \n", addr);
+    printf("start addr: %p ------------------------------------------------\n", addr);
     
     for(int i = 0; i < len; i++)
     {
