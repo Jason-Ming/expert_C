@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "printmem.h"
+#include "prototype1.h"
 
 int olddef(int x, float d, char i);
-//int newdef(int x, float d, short i, int y);
 
 void printInt(void *addr)
 {
