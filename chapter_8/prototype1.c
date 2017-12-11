@@ -2,7 +2,7 @@
 #include "printmem.h"
 #include "prototype1.h"
 
-olddef(x, d, i)
+int olddef(x, d, i)
 int x;
 float d;
 char i;
