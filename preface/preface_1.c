@@ -58,7 +58,11 @@ int main()
 
 	//time_t 一般在time.h头文件中定义为long, 在32位机中是32位, 在64位机中是64位
 	
-	//打印当前的时间，使用time获取的时间是带时区的,使用gmt获取世界时间
+	//time_t表示基于标准时间1970年1月1日0时0分0秒到现在的秒数，
+	//在任何时区内，这个值都是一定的。
+	
+	//ctime打印当前的时间，是带时区的,使用gmt获取世界时间，即0时区
+	
 	//ctime是将time_t转换为可以显示的时间,
 	time_t current_time = time(&current_time);
 	print_time("current time", current_time);
@@ -84,31 +88,51 @@ int main()
 	print_time("smallest", 0x8000000000000000);
 
 
-	//但是因为ctime它能显示的年的最大值为32位有符号整数的最大值即0x7FFFFFFF,
+	//但是因为ctime/asctime它能显示的年的最大值为32位有符号整数的最大值即0x7FFFFFFF,
 	//那么其能输入的最大值为0x7FFFFFFF年12月31日23时59分59秒
-	//最小值为0x80000000年1月1日0时0分0秒
+	
+	//以下讨论的gmt的各种值和假设都基于东八区与标准时间，东区时是下面的最大值，
+	//西区时需要减去时区，因为UTC时间要大于本地时间
 
 	struct tm biggest_tm;
-	biggest_tm.tm_year = 0x7FFFFFFF - 1900;
+	biggest_tm.tm_year = 0x7FFFFFFF - 1900;//int 类型
 	biggest_tm.tm_mon = 11;
 	biggest_tm.tm_mday = 31;
 	biggest_tm.tm_hour = 23;
 	biggest_tm.tm_min = 59;
 	biggest_tm.tm_sec = 59;
+
+	//mktime用来将参数所指的tm结构数据转换成从公元1970年1月1日0时0分0 秒算起至今的UTC时间所经过的秒数。
+	//即将参数转换为UTC时间再与1970年1月1日0时0分0秒相减
 	time_t biggest = mktime(&biggest_tm);
 
 	print_time("biggest", biggest);
 	
 
+	//最小值为0x80000000年1月1日0时0分0秒，但是小于1900年的时候，
+	//所以虽然能显示格式化的时间，但gmtime(&t)的值会出现问题，与t相差的不是整数倍的时区
+	//如下时间为最小的t可以正常计算时区的时间
 	struct tm smallest_tm;
-	smallest_tm.tm_year = 01;
+	smallest_tm.tm_year = 00;
+	smallest_tm.tm_mon = 11;
+	smallest_tm.tm_mday = 31;
+	smallest_tm.tm_hour = 23;
+	smallest_tm.tm_min = 54;
+	smallest_tm.tm_sec = 17;
+	time_t smallest = mktime(&smallest_tm);
+
+	print_time("smallest", smallest);
+
+	//若不考虑gmtime(&t)的问题，以东八区为例相差8小时5分43秒，那么最小可格式化显示的值为
+	//其他时区的时间值不确定，没有试验
+	smallest_tm.tm_year = -0x80000000;
 	smallest_tm.tm_mon = 0;
 	smallest_tm.tm_mday = 1;
-	smallest_tm.tm_hour = 0;
-	smallest_tm.tm_min = 0;
-	smallest_tm.tm_sec = 0;
-	time_t smallest = mktime(&smallest_tm);
-	smallest-=300;
+	smallest_tm.tm_hour = 8;
+	smallest_tm.tm_min = 5;
+	smallest_tm.tm_sec = 43;
+	smallest = mktime(&smallest_tm);
+	//smallest--;
 
 	print_time("smallest", smallest);
 #endif
