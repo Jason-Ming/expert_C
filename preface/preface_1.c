@@ -24,15 +24,15 @@ int main()
 	printf("biggest = %ld, %s \n", biggest, ctime(&biggest));
 	printf("biggest = %ld, %s \n", biggest, asctime(gmtime(&biggest)));
 
-	biggest = 0;
+	time_t zero = 0;
 
-	printf("biggest = %ld, %s \n", biggest, ctime(&biggest));
-	printf("biggest = %ld, %s \n", biggest, asctime(gmtime(&biggest)));
+	printf("zero = %ld, %s \n", zero, ctime(&zero));
+	printf("zero = %ld, %s \n", zero, asctime(gmtime(&zero)));
 
-	biggest = 0x80000000;
+	time_t smallest = 0x80000000;
 
-	printf("biggest = %ld, %s \n", biggest, ctime(&biggest));
-	printf("biggest = %ld, %s \n", biggest, asctime(gmtime(&biggest)));
+	printf("smallest = %ld, %s \n", smallest, ctime(&smallest));
+	printf("smallest = %ld, %s \n", smallest, asctime(gmtime(&smallest)));
 #endif
 
 #ifdef __x86_64__
@@ -43,17 +43,19 @@ int main()
 	printf("biggest = %ld, %s \n", biggest, ctime(&biggest));
 	printf("biggest = %ld, %s \n", biggest, asctime(gmtime(&biggest)));
 
-	biggest = 0;
+	time_t zero = 0;
 
-	printf("biggest = %ld, %s \n", biggest, ctime(&biggest));
-	printf("biggest = %ld, %s \n", biggest, asctime(gmtime(&biggest)));
+	printf("zero = %ld, %s \n", zero, ctime(&zero));
+	printf("zero = %ld, %s \n", zero, asctime(gmtime(&zero)));
 
-	biggest = 0x8000000000000000;
+	time_t smallest = 0x8000000000000000;
 
-	printf("biggest = %ld, %s \n", biggest, ctime(&biggest));
-	printf("biggest = %ld, %s \n", biggest, asctime(gmtime(&biggest)));
+	printf("smallest = %ld, %s \n", smallest, ctime(&smallest));
+	printf("smallest = %ld, %s \n", smallest, asctime(gmtime(&smallest)));
+
 	//但是因为ctime它能显示的年的最大值为32位有符号整数的最大值即0x7FFFFFFF,
 	//那么其能输入的最大值为0x7FFFFFFF年12月31日23时59分59秒
+	//最小值为0x80000000年1月1日0时0分0秒
 
 	struct tm biggest_tm;
 	biggest_tm.tm_year = 0x7FFFFFFF - 1900;
@@ -64,8 +66,22 @@ int main()
 	biggest_tm.tm_sec = 59;
 	biggest = mktime(&biggest_tm);
 
-	printf("biggest = %ld, %X, %s \n", biggest, biggest, ctime(&biggest));
-	//printf("biggest = %ld, %LX, %s \n", biggest, biggest, asctime(gmtime(&biggest)));
+	//%lx输出长整型long的十六进制表示，%llx和%Lx表示longlong的十六进制表示
+	printf("biggest = %ld, %lX, %s \n", biggest, biggest, ctime(&biggest));
+	printf("biggest = %ld, %lX, %s \n", biggest, biggest, asctime(gmtime(&biggest)));
+
+	struct tm smallest_tm;
+	smallest_tm.tm_year = -0x80000000;
+	smallest_tm.tm_mon = 0;
+	smallest_tm.tm_mday = 1;
+	smallest_tm.tm_hour = 0;
+	smallest_tm.tm_min = 0;
+	smallest_tm.tm_sec = 0;
+	smallest = mktime(&smallest_tm);
+
+	//%lx输出长整型long的十六进制表示，%llx和%Lx表示longlong的十六进制表示
+	printf("smallest = %ld, %lX, %s \n", smallest, smallest, ctime(&smallest));
+	printf("smallest = %ld, %lX, %s \n", smallest, smallest, asctime(gmtime(&smallest)));
 #endif
 
     
