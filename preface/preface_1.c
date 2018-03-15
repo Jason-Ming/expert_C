@@ -38,7 +38,7 @@ int main()
 #ifdef __x86_64__
 
 	//在64位系统中，理论上能表示0x8000000000000000~0x7FFFFFFFFFFFFFFF的时间段
-	biggest = 0x7FFFFFFFFFFFFFFF;
+	time_t biggest = 0x7FFFFFFFFFFFFFFF;
 
 	printf("biggest = %ld, %s \n", biggest, ctime(&biggest));
 	printf("biggest = %ld, %s \n", biggest, asctime(gmtime(&biggest)));
