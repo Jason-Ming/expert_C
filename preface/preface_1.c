@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include <sys/time.h>
 #include <limits.h>
 
 /* this is the main function! */
@@ -18,6 +19,26 @@ void print_tm(struct tm *ptm)
 	printf("		hour  : %d\n", ptm->tm_hour);
 	printf("		minute: %d\n", ptm->tm_min);
 	printf("		second: %d\n", ptm->tm_sec);
+	printf("		wday  : %d\n", ptm->tm_wday);
+	printf("		yday  : %d\n", ptm->tm_yday);
+	printf("		isdst : %d\n", ptm->tm_isdst);
+
+	time_t t = mktime(ptm);
+	printf("\n		seconds = %ld\n", t);
+
+	//strftime() 函数将时间格式化
+	//我们可以使用strftime（）函数将时间格式化为我们想要的格式。它的原型如下：
+	//size_t strftime(
+    // char *strDest,
+    // size_t maxsize,
+    // const char *format,
+    // const struct tm *timeptr
+
+	char tmpbuf[128];
+   
+	strftime( tmpbuf, 128, "\n		Date is %A, day %d of %B in the year %Y.\n", ptm);
+    printf("%s", tmpbuf);
+
 }
 
 void print_diff(time_t t, time_t current)
@@ -44,10 +65,17 @@ void print_time(char *s, time_t t)
 {
 	printf("=====BEGIN=====----------------------------------------------------------------\n");
 	print_diff(t, 0);
+
+	//ctime是将time_t转换为可以显示的时间字符串,是带时区的本地时间
 	//%lx输出长整型long的十六进制表示，%llx和%Lx表示longlong的十六进制表示
 	printf("	    %s = %ld, %lX, %s \n", s, t, t, ctime(&t));
+	
 	print_tm(gmtime(&t));
-	printf("	gmt %s = %ld, %lX, %s \n", s, t, t, asctime(gmtime(&t)));
+	print_tm(localtime(&t));
+
+	//asctime是将struct tm转换为时间字符串，将结构中的年月日小时分秒原样显示
+	printf("	  gmt %s = %ld, %lX, %s \n", s, t, t, asctime(gmtime(&t)));
+	printf("	local %s = %ld, %lX, %s \n", s, t, t, asctime(localtime(&t)));
 	printf("=====END=======----------------------------------------------------------------\n");	
 }
 
@@ -55,17 +83,48 @@ int main()
 {
 	//实际的64和32位机中，这个值都是0x7FFFFFFF
     printf("INT_MAX = %X, %d\n", INT_MAX, INT_MAX);
-
+	
+	//UTC时间有三种表示方法:
+	//(1)
 	//time_t 一般在time.h头文件中定义为long, 在32位机中是32位, 在64位机中是64位
-	
-	//time_t表示基于标准时间1970年1月1日0时0分0秒到现在的秒数，
-	//在任何时区内，这个值都是一定的。
-	
-	//ctime打印当前的时间，是带时区的,使用gmt获取世界时间，即0时区
-	
-	//ctime是将time_t转换为可以显示的时间,
+	//time_t 表示基于标准时间1970年1月1日0时0分0秒到现在的秒数，在任何时区内，这个值都是一定的。
+	//time_t time(time_t *t); 使用time获取当前时间戳time_t
+
 	time_t current_time = time(&current_time);
 	print_time("current time", current_time);
+
+	//(2)
+	//struct tm是存储的时间的结构
+	//struct tm
+	//{
+	//    int tm_sec;  /*秒，正常范围0-59， 但允许至61*/
+	//    int tm_min;  /*分钟，0-59*/
+	//    int tm_hour; /*小时， 0-23*/
+	//    int tm_mday; /*日，即一个月中的第几天，1-31*/
+	//    int tm_mon;  /*月， 从一月算起，0-11*/  1+p->tm_mon;
+	//    int tm_year;  /*年， 从1900至今已经多少年*/  1900＋ p->tm_year;
+	//    int tm_wday; /*星期，一周中的第几天， 从星期日算起，0-6*/
+	//    int tm_yday; /*从今年1月1日到目前的天数，范围0-365*/
+	//    int tm_isdst; /*日光节约时间的旗标*/
+	//};
+	//struct tm* gmtime(const time_t *timep);将time_t表示的时间转换为UTC时间，
+	//是一个struct tm结构指针,即0时区
+	//struct tm* localtime(const time_t *timep);
+	//和gmtime类似，但是它是经过时区转换的时间。
+
+
+	//(3)
+	//struct timeval，它精确到微妙。
+	//struct timeval
+	//{
+    //	long tv_sec; /*秒*/
+    //	long tv_usec; /*微秒*/
+	//};
+	//使用int gettimeofday(struct timeval *tv, struct timezone *tz);
+	struct timeval tv;
+	struct timezone tz;
+	gettimeofday(&tv, &tz);
+	printf("current time: %ld seconds, %ld useconds.\n", tv.tv_sec, tv.tv_usec);
 
 #ifdef __i386__
 	
@@ -95,7 +154,7 @@ int main()
 	//西区时需要减去时区，因为UTC时间要大于本地时间
 
 	struct tm biggest_tm;
-	biggest_tm.tm_year = 0x7FFFFFFF - 1900;//int 类型
+	biggest_tm.tm_year = 0x7FFFFFFF - 1900;//int 类型，记录1900年之后的年数
 	biggest_tm.tm_mon = 11;
 	biggest_tm.tm_mday = 31;
 	biggest_tm.tm_hour = 23;
@@ -103,7 +162,7 @@ int main()
 	biggest_tm.tm_sec = 59;
 
 	//mktime用来将参数所指的tm结构数据转换成从公元1970年1月1日0时0分0 秒算起至今的UTC时间所经过的秒数。
-	//即将参数转换为UTC时间再与1970年1月1日0时0分0秒相减
+	//既然得到的是秒数，那么就是说无论在世界任何的地方，得到的结果都是一样的，也就是说该函数处理的是本地时间
 	time_t biggest = mktime(&biggest_tm);
 
 	print_time("biggest", biggest);
