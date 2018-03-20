@@ -9,22 +9,22 @@ void print_tm(struct tm *ptm)
 {
 	if(ptm == NULL)
 	{
-		printf("	print tm: null\n");
+		printf("		print tm: null\n");
 		return;
 	}
-	printf("	print tm:\n");
-	printf("		year  : %d\n", ptm->tm_year);
-	printf("		month : %d\n", ptm->tm_mon);
-	printf("		day   : %d\n", ptm->tm_mday);
-	printf("		hour  : %d\n", ptm->tm_hour);
-	printf("		minute: %d\n", ptm->tm_min);
-	printf("		second: %d\n", ptm->tm_sec);
-	printf("		wday  : %d\n", ptm->tm_wday);
-	printf("		yday  : %d\n", ptm->tm_yday);
-	printf("		isdst : %d\n", ptm->tm_isdst);
+	printf("		print tm:\n");
+	printf("			year  : %d\n", ptm->tm_year);
+	printf("			month : %d\n", ptm->tm_mon);
+	printf("			day   : %d\n", ptm->tm_mday);
+	printf("			hour  : %d\n", ptm->tm_hour);
+	printf("			minute: %d\n", ptm->tm_min);
+	printf("			second: %d\n", ptm->tm_sec);
+	printf("			wday  : %d\n", ptm->tm_wday);
+	printf("			yday  : %d\n", ptm->tm_yday);
+	printf("			isdst : %d\n", ptm->tm_isdst);
 
 	time_t t = mktime(ptm);
-	printf("\n		seconds = %ld\n", t);
+	printf("\n			seconds = %ld\n", t);
 
 	//strftime() 函数将时间格式化
 	//我们可以使用strftime（）函数将时间格式化为我们想要的格式。它的原型如下：
@@ -68,14 +68,15 @@ void print_time(char *s, time_t t)
 
 	//ctime是将time_t转换为可以显示的时间字符串,是带时区的本地时间
 	//%lx输出长整型long的十六进制表示，%llx和%Lx表示longlong的十六进制表示
-	printf("	    %s = %ld, %lX, %s \n", s, t, t, ctime(&t));
+	printf("	>>>>	      %s = %ld, %lX, %s \n", s, t, t, ctime(&t));
 	
+	//asctime是将struct tm转换为时间字符串，将结构中的年月日小时分秒原样显示
+	printf("	>>>>	  gmt %s = %ld, %lX, %s \n", s, t, t, asctime(gmtime(&t)));
 	print_tm(gmtime(&t));
+		
+	printf("	>>>>	local %s = %ld, %lX, %s \n", s, t, t, asctime(localtime(&t)));
 	print_tm(localtime(&t));
 
-	//asctime是将struct tm转换为时间字符串，将结构中的年月日小时分秒原样显示
-	printf("	  gmt %s = %ld, %lX, %s \n", s, t, t, asctime(gmtime(&t)));
-	printf("	local %s = %ld, %lX, %s \n", s, t, t, asctime(localtime(&t)));
 	printf("=====END=======----------------------------------------------------------------\n");	
 }
 
