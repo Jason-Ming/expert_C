@@ -11,7 +11,7 @@ struct E
 {
 };
 
-#define PRINT_SIZE(TYPE) printf("%16s %d\n", #TYPE, sizeof(TYPE));
+#define PRINT_SIZE(TYPE) printf("%16s %ld\n", #TYPE, sizeof(TYPE));
 void main()
 {
 	// Linux 平台 (基于 CentOS6.5)
@@ -28,6 +28,7 @@ void main()
 	PRINT_SIZE(void);         //x86 1   x64 1   
 	PRINT_SIZE(void*);        //x86 4   x64 8   
 	PRINT_SIZE(size_t);       //x86 4   x64 8   
+	PRINT_SIZE(ssize_t); 	  //x86 4	x64 8	
 
 	/*
 	// Windows 平台 (基于 VS2013 Win10)
