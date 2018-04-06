@@ -249,7 +249,7 @@ typedef struct TAG_STRU_T
     double d;
 }STRU_T;
 
-#define PRINT_STRU_MEMBER_INFO(type, field) printf("%s.%s: offset = %d, size = %d\n", \
+#define PRINT_STRU_MEMBER_INFO(type, field) printf("%s.%s: offset = %u, size = %u\n", \
     #type, #field, OFFSET_OF_MEMBER_IN_STRUCT(type, field), SIZE_OF_MEMBER_IN_STRUCT(type, field));
     
 #define PRINT_STRU_MEMBER\
