@@ -49,7 +49,7 @@ void main()
     
     #include "chapter_1_1_nesting.h"
 
-    printf("size of commands[] : %u\n", ARRAY_SIZE(commands) );
+    printf("size of commands[] : %lu\n", (long unsigned int)ARRAY_SIZE(commands) );
 
     long long *pll, ll = 0x0123456789abcdef;
     pll = &ll;
