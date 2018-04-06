@@ -169,6 +169,11 @@ __cplusplus // 当编写C++程序时该标识符被定义
 另外有一些是编译器相关的预定义宏：
 
 //VC：_MSC_VER// VC编译器版本号
+
+__i386__ 32位系统
+	
+__x86_64__ 64位系统
+
 */
 #define PRINT_PREDEFINE_MACROS\
     printf("file: %s, basefile: %s, line: %u, date: %s, time: %s, timestamp: %s, function: %s\n",\
@@ -249,9 +254,14 @@ typedef struct TAG_STRU_T
     double d;
 }STRU_T;
 
+#ifdef __i386__
 #define PRINT_STRU_MEMBER_INFO(type, field) printf("%s.%s: offset = %u, size = %u\n", \
     #type, #field, OFFSET_OF_MEMBER_IN_STRUCT(type, field), SIZE_OF_MEMBER_IN_STRUCT(type, field));
-    
+#elif  __x86_64__
+#define PRINT_STRU_MEMBER_INFO(type, field) printf("%s.%s: offset = %lu, size = %lu\n", \
+    #type, #field, OFFSET_OF_MEMBER_IN_STRUCT(type, field), SIZE_OF_MEMBER_IN_STRUCT(type, field));
+#endif
+
 #define PRINT_STRU_MEMBER\
     do{\
         PRINT_STRU_MEMBER_INFO(STRU_T, c);\
